@@ -1,0 +1,10 @@
+{% extends 'myapp/base.html' %}
+{% block body %}
+<h1>Checkout</h1>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="product_id" value="{{ product.id }}">
+    <p>Product: {{ product.name }} - Price: {{ product.price }}</p>
+    <button type="submit">Proceed to Bank Transfer</button>
+</form>
+{% endblock%}

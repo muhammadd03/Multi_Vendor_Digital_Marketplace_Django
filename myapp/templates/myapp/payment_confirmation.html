@@ -1,0 +1,8 @@
+{% extends 'myapp/base.html' %}
+{% block body %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    your payment has been confirmed
+    <button type="submit">Next</button>
+</form>
+{% endblock %}

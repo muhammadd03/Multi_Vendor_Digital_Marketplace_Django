@@ -1,0 +1,23 @@
+{% extends 'myapp/base.html' %}
+{% block body %}
+<h3>Bank Transfer Details</h3>
+<p>Please transfer the total amount to the following bank account:</p>
+<p>Account Name: Your Business Name</p>
+<p>Account Number: 123456789</p>
+<p>Bank Name: Your Bank Name</p>
+<p>Branch Code: 001234</p>
+<p>SWIFT Code: ABCD1234</p>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="product_id" value="{{ product.id }}">
+    <label for="amount">Amount:</label>
+    <input type="text" name="amount" id="amount" value="{{ product.price }}" required>
+    <label for="customer_email">Email:</label>
+    <input type="email" name="customer_email" id="customer_email" value="{{ user.email }}" >
+    <label for="reciept">Receipt:</label>
+    <input type="file" name="reciept" id="reciept" required>
+    <button type="submit">Done</button>
+</form>
+
+{% endblock%}
