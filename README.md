@@ -1,4 +1,4 @@
-##Multi-Vendor Digital Marketplace
+#Multi-Vendor Digital Marketplace
 Welcome to the Multi-Vendor Digital Marketplace project! This application is designed to provide a seamless platform for multiple vendors to sell their digital products. Built with Django for the backend and HTML, CSS, JavaScript, and Tailwind CSS for the frontend, this marketplace ensures a user-friendly experience for both vendors and customers.
 
 ###Features
