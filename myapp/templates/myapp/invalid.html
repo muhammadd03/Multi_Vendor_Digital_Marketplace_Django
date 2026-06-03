@@ -1,6 +1,23 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<div class="flex flex-col justify-center items-center min-h-screen">
-    <h1 class="font-bold text-red-500 text-lg">Invalid Request</h1>
+
+<div class="min-h-[75vh] flex flex-col items-center justify-center text-center px-6 py-16">
+
+    <div class="text-8xl text-[#D4A017]/30 select-none mb-6 font-playfair">✦</div>
+
+    <h1 class="text-3xl md:text-4xl font-bold font-playfair text-[#8B6914] mb-4">
+        Oops! Something went wrong.
+    </h1>
+
+    <p class="text-base text-[#5A3E1A]/60 max-w-md leading-relaxed mb-10">
+        This request is invalid or you don't have permission to access this page.
+    </p>
+
+    <a href="{% url 'index' %}"
+       class="bg-[#D4A017] text-white rounded-full px-10 py-3.5 font-semibold hover:bg-[#6B4F10] transition-colors text-base">
+        Go Home
+    </a>
+
 </div>
+
 {% endblock %}

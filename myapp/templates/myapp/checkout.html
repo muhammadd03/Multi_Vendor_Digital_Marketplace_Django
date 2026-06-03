@@ -1,10 +1,110 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<h1>Checkout</h1>
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="product_id" value="{{ product.id }}">
-    <p>Product: {{ product.name }} - Price: {{ product.price }}</p>
-    <button type="submit">Proceed to Bank Transfer</button>
-</form>
-{% endblock%}
+
+<!-- Page header -->
+<div class="bg-[#F5F0E8] border-b border-[#D4A017]/20 py-10 text-center">
+    <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-2 font-semibold">Step 1 of 2</p>
+    <h1 class="text-3xl font-bold font-playfair text-[#8B6914]">Checkout <span class="text-[#D4A017]">✦</span></h1>
+</div>
+
+<div class="flex justify-center px-4 py-12">
+    <div class="bg-white rounded-2xl shadow-md p-8 border border-[#D4A017]/20 w-full max-w-lg">
+
+        <!-- Order summary -->
+        <div class="bg-[#F5F0E8] rounded-xl p-5 mb-6 flex items-center justify-between">
+            <div>
+                <p class="text-xs text-[#8B6914]/60 uppercase tracking-wide mb-1">Product</p>
+                <p class="font-bold font-playfair text-[#8B6914] text-lg">{{ product.name }}</p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-[#8B6914]/60 uppercase tracking-wide mb-1">Total</p>
+                <p class="text-[#D4A017] font-bold text-2xl">PKR {{ product.price|floatformat:0 }}</p>
+            </div>
+        </div>
+
+        <hr class="border-[#D4A017]/30 mb-6">
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            {% if checkout_form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600">
+                Please fill in all required fields correctly.
+            </div>
+            {% endif %}
+
+            <!-- Full Name -->
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Full Name</label>
+                <input type="text" name="full_name"
+                       value="{{ checkout_form.data.full_name|default:'' }}"
+                       placeholder="e.g. Ayesha Khan"
+                       class="w-full border border-[#8B6914]/40 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#D4A017] bg-[#FFFDF8] text-[#3A2A10]" required>
+                {% if checkout_form.full_name.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ checkout_form.full_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Phone Number -->
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Phone Number</label>
+                <input type="tel" name="phone_number"
+                       value="{{ checkout_form.data.phone_number|default:'' }}"
+                       placeholder="e.g. 0312-1234567"
+                       class="w-full border border-[#8B6914]/40 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#D4A017] bg-[#FFFDF8] text-[#3A2A10]" required>
+            </div>
+
+            <!-- Address -->
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Delivery Address</label>
+                <textarea name="address" rows="3"
+                          placeholder="House no., street, area..."
+                          class="w-full border border-[#8B6914]/40 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#D4A017] bg-[#FFFDF8] text-[#3A2A10] resize-none" required>{{ checkout_form.data.address|default:'' }}</textarea>
+            </div>
+
+            <!-- City -->
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">City</label>
+                <input type="text" name="city"
+                       value="{{ checkout_form.data.city|default:'' }}"
+                       placeholder="e.g. Karachi"
+                       class="w-full border border-[#8B6914]/40 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#D4A017] bg-[#FFFDF8] text-[#3A2A10]" required>
+            </div>
+
+            <!-- Payment Method -->
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-2">Payment Method</label>
+                <div class="flex gap-3">
+                    <label class="flex-1 text-center cursor-pointer">
+                        <input type="radio" name="payment_method" value="bank_transfer"
+                               {% if checkout_form.data.payment_method != 'cod' %}checked{% endif %}
+                               class="sr-only peer">
+                        <span class="block py-3 rounded-xl border border-[#D4A017]/40
+                                     peer-checked:bg-[#D4A017] peer-checked:border-[#D4A017] peer-checked:text-white
+                                     text-[#8B6914] text-sm font-medium transition-all select-none">
+                            🏦 Bank Transfer
+                        </span>
+                    </label>
+                    <label class="flex-1 text-center cursor-pointer">
+                        <input type="radio" name="payment_method" value="cod"
+                               {% if checkout_form.data.payment_method == 'cod' %}checked{% endif %}
+                               class="sr-only peer">
+                        <span class="block py-3 rounded-xl border border-[#D4A017]/40
+                                     peer-checked:bg-[#D4A017] peer-checked:border-[#D4A017] peer-checked:text-white
+                                     text-[#8B6914] text-sm font-medium transition-all select-none">
+                            💵 Cash on Delivery
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-[#D4A017] text-white rounded-full px-6 py-3.5 font-semibold hover:bg-[#6B4F10] transition-colors text-base mt-2">
+                Continue →
+            </button>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

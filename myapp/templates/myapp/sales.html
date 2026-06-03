@@ -1,85 +1,122 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<div class="flex justify-between">
-    <div class="ml-10 mt-10 font-bold text-xl">Sales Stats</div>
-    <div class="mr-20 mt-10">
-        <a class="bg-green-500 text-white px-2 py-4" href="{% url 'dashboard' %}">Dashboard</a>
-    </div>
+
+<!-- Page header -->
+<div class="bg-[#F5F0E8] border-b border-[#D4A017]/20 py-14 text-center">
+    <h1 class="text-4xl font-bold font-playfair text-[#8B6914] mb-1">Sales Analytics <span class="text-[#D4A017]">✦</span></h1>
+    <p class="text-sm text-[#5A3E1A]/60">Track your Yarnivore store performance</p>
 </div>
-<div class="shadow-lg p-10 m-5">
-    <div class="text-5xl font-bold">${{ total_sales.amount__sum }}</div>
-    <div class="mt-10">Your life time revenue</div>
-</div>
-<div class="flex">
-    <div class="p-5 w-1/3">
-        <div class="shadow-lg p-10">
-            <div class="text-4xl font-bold">${{ yearly_sales.amount__sum }}</div>
-            <div>Last 365 days</div>
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- Revenue summary cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20 text-center">
+            <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-3">Lifetime Revenue</p>
+            <p class="text-4xl font-bold font-playfair text-[#8B6914]">PKR {{ total_sales.amount__sum|default:"0" }}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20 text-center">
+            <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-3">Last 365 Days</p>
+            <p class="text-4xl font-bold font-playfair text-[#D4A017]">PKR {{ yearly_sales.amount__sum|default:"0" }}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20 text-center">
+            <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-3">Last 30 Days</p>
+            <p class="text-4xl font-bold font-playfair text-[#8B6914]">PKR {{ monthly_sales.amount__sum|default:"0" }}</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20 text-center">
+            <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-3">Last 7 Days</p>
+            <p class="text-4xl font-bold font-playfair text-[#D4A017]">PKR {{ weekly_sales.amount__sum|default:"0" }}</p>
         </div>
     </div>
-    <div class="p-5 w-1/3">
-        <div class="shadow-lg p-10">
-            <div class="text-4xl font-bold">${{ monthly_sales.amount__sum }}</div>
-            <div>Last 30 days</div>
+
+    <hr class="border-[#D4A017]/30 my-8">
+
+    <!-- Charts + tables row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+
+        <!-- 30-Day Sales Table -->
+        <div class="bg-white rounded-2xl shadow-md border border-[#D4A017]/20 overflow-hidden">
+            <div class="px-6 py-5 border-b border-[#D4A017]/15">
+                <h2 class="text-xl font-bold font-playfair text-[#8B6914]">30 Day Sales</h2>
+            </div>
+            <div class="overflow-y-auto max-h-80">
+                <table class="w-full text-sm">
+                    <thead class="bg-[#F5F0E8] text-[#8B6914] sticky top-0">
+                        <tr>
+                            <th class="text-left px-6 py-3 font-semibold">Date</th>
+                            <th class="text-right px-6 py-3 font-semibold">Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for daily_sales_sum in daily_sales_sums %}
+                        <tr class="border-t border-[#D4A017]/10 {% if forloop.even %}bg-[#FFFDF8]{% else %}bg-white{% endif %}">
+                            <td class="px-6 py-3 created-date text-[#5A3E1A]">{{ daily_sales_sum.created_on__date }}</td>
+                            <td class="px-6 py-3 text-right day-sum font-bold text-[#D4A017]">{{ daily_sales_sum.sum }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="px-6 py-10 text-center text-[#8B6914]/40">No sales data yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    <div class="p-5 w-1/3">
-        <div class="shadow-lg p-10">
-            <div class="text-4xl font-bold">${{ weekly_sales.amount__sum }}</div>
-            <div>Last 7 days</div>
-        </div>
-    </div>
-</div>
-<div class="flex ">
-    <div class="w-1/2 shadow-lg m-10" id="sales-table">
-        <div class="ml-10 mt-10 font-bold text-xl">30 Day Sales</div>
-        <div class="flex m-10 mt-5 mb-5">
-            <div class="w-1/2">Day</div>
-            <div class="w-1/2">Total Sales</div>
-        </div>
-        {% for daily_sales_sum in daily_sales_sums %}
-        <div class="flex m-10 mt-5 mb-5">
-            <div class="w-1/2 created-date">{{ daily_sales_sum.created_on__date }}</div>
-            <div class="w-1/2 day-sum font-bold text-green-500">{{ daily_sales_sum.sum }}</div>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="w-1/2 shadow-lg m-10 ">
-        <div class="ml-10 mt-10 font-bold text-xl">30 Days Sales</div>
+
+        <!-- 30-Day Chart -->
+        <div class="bg-white rounded-2xl shadow-md border border-[#D4A017]/20 p-6">
+            <h2 class="text-xl font-bold font-playfair text-[#8B6914] mb-4">30 Days Sales Chart</h2>
             <canvas id="myChart"></canvas>
-        
+        </div>
+
     </div>
-</div>
-<div class="flex ">
-    <div class="w-1/2 shadow-lg m-10 ">
-        <div class="ml-10 mt-10 font-bold text-xl">Product Sales Distribution</div>
+
+    <!-- Charts + tables row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Product Distribution Chart -->
+        <div class="bg-white rounded-2xl shadow-md border border-[#D4A017]/20 p-6">
+            <h2 class="text-xl font-bold font-playfair text-[#8B6914] mb-4">Product Sales Distribution</h2>
             <canvas id="myChart1"></canvas>
-        
-    </div>
-    <div class="w-1/2 shadow-lg m-10">
-        <div class="ml-10 mt-10 font-bold text-xl">Product Sales</div>
-        <div class="flex m-10 mt-5 mb-5">
-            <div class="w-1/2">Product Name</div>
-            <div class="w-1/2">Total Sales</div>
         </div>
-        {% for product_sales_sum in product_sales_sums %}
-        <div class="flex m-10 mt-5 mb-5">
-            <div class="w-1/2 product-name">{{ product_sales_sum.product__name }}</div>
-            <div class="w-1/2 font-bold text-green-500 product-sum">{{ product_sales_sum.sum }}</div>
+
+        <!-- Product Sales Table -->
+        <div class="bg-white rounded-2xl shadow-md border border-[#D4A017]/20 overflow-hidden">
+            <div class="px-6 py-5 border-b border-[#D4A017]/15">
+                <h2 class="text-xl font-bold font-playfair text-[#8B6914]">Product Sales</h2>
+            </div>
+            <div class="overflow-y-auto max-h-80">
+                <table class="w-full text-sm">
+                    <thead class="bg-[#F5F0E8] text-[#8B6914] sticky top-0">
+                        <tr>
+                            <th class="text-left px-6 py-3 font-semibold">Product</th>
+                            <th class="text-right px-6 py-3 font-semibold">Total Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product_sales_sum in product_sales_sums %}
+                        <tr class="border-t border-[#D4A017]/10 {% if forloop.even %}bg-[#FFFDF8]{% else %}bg-white{% endif %}">
+                            <td class="px-6 py-3 product-name text-[#5A3E1A]">{{ product_sales_sum.product__name }}</td>
+                            <td class="px-6 py-3 text-right product-sum font-bold text-[#D4A017]">{{ product_sales_sum.sum }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="px-6 py-10 text-center text-[#8B6914]/40">No sales data yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        {% endfor %}
+
     </div>
+
 </div>
 
+<!-- Chart.js logic preserved exactly -->
 <script>
-
     const sums = document.getElementsByClassName('day-sum');
     const sum_values = [];
     for(let i=0;i<sums.length;i++){
         single_sum = sums[i].innerText;
         sum_values.push(parseInt(single_sum));
     }
-    console.log(sum_values);
 
     const dates = document.getElementsByClassName('created-date');
     const date_values = [];
@@ -89,7 +126,6 @@
     }
 
     const ctx = document.getElementById('myChart');
-  
     new Chart(ctx, {
       type: 'line',
       data: {
@@ -102,9 +138,7 @@
       },
       options: {
         scales: {
-          y: {
-            beginAtZero: true
-          }
+          y: { beginAtZero: true }
         }
       }
     });
@@ -122,10 +156,8 @@
         single_sum = product_sums[i].innerText;
         product_sum_values.push(single_sum);
     }
-    console.log(product_sum_values)
 
     const ctx1 = document.getElementById('myChart1');
-  
     new Chart(ctx1, {
       type: 'bar',
       data: {
@@ -138,11 +170,10 @@
       },
       options: {
         scales: {
-          y: {
-            beginAtZero: true
-          }
+          y: { beginAtZero: true }
         }
       }
     });
-  </script>
+</script>
+
 {% endblock %}

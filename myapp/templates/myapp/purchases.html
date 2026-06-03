@@ -1,25 +1,64 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<div class="flex justify-between">
-    <div class="ml-20 mt-10 font-bold text-xl">My Purchases</div>
-    <div class="ml-20 mt-10">
-        <a class="bg-green-500 text-white px-2 py-4 mr-8 rounded" href="{% url 'createproduct' %}">New Product</a>
-    </div>
+
+<!-- Page header -->
+<div class="bg-[#F5F0E8] border-b border-[#D4A017]/20 py-14 text-center">
+    <h1 class="text-4xl font-bold font-playfair text-[#8B6914] mb-1">My Purchases <span class="text-[#D4A017]">✦</span></h1>
+    <p class="text-sm text-[#5A3E1A]/60">Your complete order history</p>
 </div>
-<div class="order-container p-10 m-5 shadow-lg">
-    <div class="order-header flex font-bold m-5 p-2">
-        <div class="w-1/4">Product Name</div>
-        <div class="w-1/4">Amount Paid</div>
-        <div class="w-1/4">Order Date</div>
-        <div class="w-1/4">Download Link</div>
+
+<div class="max-w-4xl mx-auto px-6 py-10">
+
+    {% if orders %}
+    <div class="space-y-4">
+        {% for order in orders %}
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                <!-- Product info -->
+                <div class="flex-1">
+                    <h3 class="font-bold font-playfair text-[#8B6914] text-xl mb-1">{{ order.product.name }}</h3>
+                    <p class="text-xs text-[#8B6914]/50">Ordered {{ order.created_on|date:"N j, Y" }}</p>
+                </div>
+
+                <!-- Amount + status + action -->
+                <div class="flex items-center gap-4 flex-wrap">
+                    <div class="text-right">
+                        <p class="text-[#D4A017] font-bold text-2xl">PKR {{ order.amount }}</p>
+                        {% if order.has_paid %}
+                        <span class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-3 py-0.5 rounded-full mt-1">Paid</span>
+                        {% else %}
+                        <span class="inline-block bg-yellow-100 text-yellow-700 text-xs font-semibold px-3 py-0.5 rounded-full mt-1">Pending</span>
+                        {% endif %}
+                    </div>
+                    {% if order.has_paid %}
+                    <a href="{{ order.product.file.url }}" download
+                       class="bg-[#D4A017] text-white rounded-full px-6 py-2 text-sm font-semibold hover:bg-[#6B4F10] transition-colors whitespace-nowrap">
+                        Download
+                    </a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% for order in orders %}
-    <div class="flex m-5 p-2 justify-between">
-        <div class="w-1/4">{{ order.product.name }}</div>
-        <div class="w-1/4 text-green-500">${{ order.amount }}</div>
-        <div class="w-1/4">{{ order.created_on }}</div>
-        <div class="w-1/4"><a class="bg-green-500 text-white px-4  py-2" href="{{order.product.file.url}}" download>Click to download</a></div>
-    </div> 
-    {% endfor %}
+
+    {% else %}
+
+    <!-- Empty state -->
+    <div class="text-center py-24">
+        <p class="text-7xl mb-4">🛍️</p>
+        <h3 class="text-2xl font-bold font-playfair text-[#8B6914] mb-2">No purchases yet</h3>
+        <p class="text-sm text-[#5A3E1A]/60 mb-8">You haven't made any purchases yet. Explore our handmade collection!</p>
+        <a href="{% url 'products' %}"
+           class="bg-[#D4A017] text-white rounded-full px-10 py-3 font-semibold hover:bg-[#6B4F10] transition-colors">
+            Browse Products
+        </a>
+    </div>
+
+    {% endif %}
+
 </div>
+
 {% endblock %}

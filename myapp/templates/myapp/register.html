@@ -34,10 +34,21 @@
                 {{ user_form.password2 }}
             </div>
         </div>
-        
+        <div class="mb-4">
+            <label class="block mb-2 text-sm font-medium text-gray-700">I am joining as</label>
+            <div class="flex gap-6">
+                {% for radio in user_form.role %}
+                <label class="flex items-center gap-2 cursor-pointer text-sm text-[#5A3E1A]">
+                    {{ radio.tag }}
+                    {{ radio.choice_label }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
         <button class="bg-green-500 text-white px-4 py-2 rounded" type="submit">Create User</button>
     </form>
-    <p class="m-10">Already Registered? <span><a class="text-indigo-500" href="{% url 'login' %}">Click here</a> to login</p></span>
+    <p class="m-10">Already Registered? <span><a class="text-indigo-500" href="{% url 'auth' %}">Click here</a> to login</p></span>
 </div>
 
 {% endblock %}

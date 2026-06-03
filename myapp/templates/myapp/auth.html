@@ -1,0 +1,198 @@
+{% extends 'myapp/base.html' %}
+{% block body %}
+
+<div class="min-h-screen bg-gradient-to-br from-[#F5F0E8] via-[#EDE4D0] to-[#F5F0E8] flex items-center justify-center py-12 px-4">
+    <div class="bg-white rounded-2xl shadow-lg w-full max-w-md overflow-hidden">
+
+        <!-- Tab headers -->
+        <div class="flex border-b border-gray-100">
+            <button id="tab-login" onclick="showTab('login')"
+                    class="flex-1 py-4 text-sm font-semibold transition-all">
+                Login
+            </button>
+            <button id="tab-register" onclick="showTab('register')"
+                    class="flex-1 py-4 text-sm font-semibold transition-all">
+                Register
+            </button>
+        </div>
+
+        <!-- ===== LOGIN FORM ===== -->
+        <div id="form-login">
+            <div class="p-8">
+                <h2 class="text-2xl font-bold font-serif text-[#8B6914] mb-1">Welcome back</h2>
+                <p class="text-sm text-[#8B6914]/60 mb-6">Sign in to your Yarnivore account</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    {% if login_form.non_field_errors %}
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                        {% for error in login_form.non_field_errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-1.5">Username</label>
+                        <input type="text" name="username"
+                               value="{{ login_form.data.username|default:'' }}"
+                               autocomplete="username"
+                               class="w-full border border-[#8B6914]/30 rounded-lg px-3 py-2.5 text-sm text-[#3A2A10] focus:outline-none focus:ring-2 focus:ring-[#D4A017]/40 focus:border-[#D4A017] transition-colors">
+                        {% if login_form.username.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ login_form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-1.5">Password</label>
+                        <input type="password" name="password"
+                               autocomplete="current-password"
+                               class="w-full border border-[#8B6914]/30 rounded-lg px-3 py-2.5 text-sm text-[#3A2A10] focus:outline-none focus:ring-2 focus:ring-[#D4A017]/40 focus:border-[#D4A017] transition-colors">
+                    </div>
+
+                    <button name="login_submit" type="submit"
+                            class="w-full bg-[#D4A017] hover:bg-[#B8880E] text-white font-semibold py-3 rounded-lg transition-colors">
+                        Login
+                    </button>
+                </form>
+
+                <p class="text-center text-sm text-[#8B6914]/70 mt-6">
+                    Don't have an account?
+                    <button onclick="showTab('register')"
+                            class="text-[#D4A017] font-semibold hover:underline">Register here</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- ===== REGISTER FORM ===== -->
+        <div id="form-register" class="hidden">
+            <div class="p-8">
+                <h2 class="text-2xl font-bold font-serif text-[#8B6914] mb-1">Create account</h2>
+                <p class="text-sm text-[#8B6914]/60 mb-6">Join the Yarnivore community</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    {% if register_form.non_field_errors %}
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                        {% for error in register_form.non_field_errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-1.5">Username</label>
+                        <input type="text" name="username"
+                               value="{{ register_form.data.username|default:'' }}"
+                               autocomplete="username"
+                               class="w-full border border-[#8B6914]/30 rounded-lg px-3 py-2.5 text-sm text-[#3A2A10] focus:outline-none focus:ring-2 focus:ring-[#D4A017]/40 focus:border-[#D4A017] transition-colors">
+                        {% if register_form.username.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ register_form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-1.5">Email</label>
+                        <input type="email" name="email"
+                               value="{{ register_form.data.email|default:'' }}"
+                               autocomplete="email"
+                               class="w-full border border-[#8B6914]/30 rounded-lg px-3 py-2.5 text-sm text-[#3A2A10] focus:outline-none focus:ring-2 focus:ring-[#D4A017]/40 focus:border-[#D4A017] transition-colors">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-1.5">First Name</label>
+                        <input type="text" name="first_name"
+                               value="{{ register_form.data.first_name|default:'' }}"
+                               class="w-full border border-[#8B6914]/30 rounded-lg px-3 py-2.5 text-sm text-[#3A2A10] focus:outline-none focus:ring-2 focus:ring-[#D4A017]/40 focus:border-[#D4A017] transition-colors">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-1.5">Password</label>
+                        <input type="password" name="password"
+                               autocomplete="new-password"
+                               class="w-full border border-[#8B6914]/30 rounded-lg px-3 py-2.5 text-sm text-[#3A2A10] focus:outline-none focus:ring-2 focus:ring-[#D4A017]/40 focus:border-[#D4A017] transition-colors">
+                        {% if register_form.password.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ register_form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-1.5">Confirm Password</label>
+                        <input type="password" name="password2"
+                               autocomplete="new-password"
+                               class="w-full border border-[#8B6914]/30 rounded-lg px-3 py-2.5 text-sm text-[#3A2A10] focus:outline-none focus:ring-2 focus:ring-[#D4A017]/40 focus:border-[#D4A017] transition-colors">
+                        {% if register_form.password2.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ register_form.password2.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Role pill toggle -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-[#5A3E1A] mb-2">I am joining as</label>
+                        <div class="flex gap-3">
+                            <label class="flex-1 text-center cursor-pointer">
+                                <input type="radio" name="role" value="customer"
+                                       {% if register_form.data.role != 'vendor' %}checked{% endif %}
+                                       class="sr-only peer">
+                                <span class="block py-2.5 rounded-full border border-[#D4A017]/40
+                                             peer-checked:bg-[#D4A017] peer-checked:border-[#D4A017] peer-checked:text-white
+                                             text-[#8B6914] text-sm font-medium transition-all select-none">
+                                    🛍️ Customer
+                                </span>
+                            </label>
+                            <label class="flex-1 text-center cursor-pointer">
+                                <input type="radio" name="role" value="vendor"
+                                       {% if register_form.data.role == 'vendor' %}checked{% endif %}
+                                       class="sr-only peer">
+                                <span class="block py-2.5 rounded-full border border-[#D4A017]/40
+                                             peer-checked:bg-[#D4A017] peer-checked:border-[#D4A017] peer-checked:text-white
+                                             text-[#8B6914] text-sm font-medium transition-all select-none">
+                                    🧶 Vendor
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button name="register_submit" type="submit"
+                            class="w-full bg-[#D4A017] hover:bg-[#B8880E] text-white font-semibold py-3 rounded-lg transition-colors">
+                        Create Account
+                    </button>
+                </form>
+
+                <p class="text-center text-sm text-[#8B6914]/70 mt-6">
+                    Already have an account?
+                    <button onclick="showTab('login')"
+                            class="text-[#D4A017] font-semibold hover:underline">Login here</button>
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function showTab(tab) {
+    const formLogin    = document.getElementById('form-login');
+    const formRegister = document.getElementById('form-register');
+    const tabLogin     = document.getElementById('tab-login');
+    const tabRegister  = document.getElementById('tab-register');
+
+    const on  = ['text-[#D4A017]', 'border-b-2', 'border-[#D4A017]'];
+    const off = ['text-gray-400'];
+
+    if (tab === 'login') {
+        formLogin.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+        tabLogin.classList.add(...on);    tabLogin.classList.remove(...off);
+        tabRegister.classList.remove(...on); tabRegister.classList.add(...off);
+    } else {
+        formRegister.classList.remove('hidden');
+        formLogin.classList.add('hidden');
+        tabRegister.classList.add(...on); tabRegister.classList.remove(...off);
+        tabLogin.classList.remove(...on);    tabLogin.classList.add(...off);
+    }
+}
+
+// Activate the correct tab on load (handles form-error redirects from server)
+showTab('{{ active_tab }}');
+</script>
+
+{% endblock %}

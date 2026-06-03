@@ -1,31 +1,70 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<div class="w-1/2 m-20">
-    <h1 class="font-bold text-lg">Edit Product</h1>
-    <form class="shadow-lg p-10 " method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div>
-            <label>Name</label>
-            <div class="border rounded appearance-none py-2 px-2 mr-10">{{ product_form.name }}</div>
-        </div>
-        <div>
-            <label>Description</label>
-            <div class="border rounded appearance-none py-2 px-2 mr-10">{{ product_form.description }}</div>
-        </div>
-        <div>
-            <label>Price</label>
-            <div class="border rounded appearance-none py-2 px-2 mr-10">{{ product_form.price }}</div>
-        </div>
-        <div>
-            <label>Upload File</label>
-            <div class="rounded appearance-none py-2 px-2 mr-10">{{ product_form.file }}</div>
-        </div>
-        <div class="mt-6">
-            <button class="bg-green-500 text-white px-4 py-2" type="submit">Update</button>
-        </div>
-    </form>
+
+<!-- Page header -->
+<div class="bg-[#F5F0E8] border-b border-[#D4A017]/20 py-14 text-center">
+    <h1 class="text-4xl font-bold font-playfair text-[#8B6914] mb-1">Edit Product <span class="text-[#D4A017]">✦</span></h1>
+    <p class="text-sm text-[#5A3E1A]/60">Update your product details</p>
 </div>
-<div class="m-20">
-    <a class="bg-red-500 text-white px-6 py-3" href="{% url 'delete' product.id %}">Delete</a>
+
+<div class="flex justify-center px-4 py-12">
+    <div class="bg-white rounded-2xl shadow-md p-8 border border-[#D4A017]/20 w-full max-w-lg">
+
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Product Name</label>
+                <div class="w-full border border-[#8B6914]/40 rounded-xl px-4 py-2.5 focus-within:ring-2 focus-within:ring-[#D4A017] bg-[#FFFDF8]">
+                    {{ product_form.name }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Description</label>
+                <div class="w-full border border-[#8B6914]/40 rounded-xl px-4 py-2.5 focus-within:ring-2 focus-within:ring-[#D4A017] bg-[#FFFDF8]">
+                    {{ product_form.description }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Price ($)</label>
+                <div class="w-full border border-[#8B6914]/40 rounded-xl px-4 py-2.5 focus-within:ring-2 focus-within:ring-[#D4A017] bg-[#FFFDF8]">
+                    {{ product_form.price }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Product Image <span class="text-[#8B6914]/40">(shown in store)</span></label>
+                <div class="border-2 border-dashed border-[#D4A017]/50 rounded-xl p-5 text-center bg-[#FFFDF8]">
+                    <p class="text-[#8B6914]/50 text-xs mb-2">Leave blank to keep existing image</p>
+                    {{ product_form.image }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-[#8B6914] mb-1.5">Digital File <span class="text-[#8B6914]/40">(downloadable by buyer)</span></label>
+                <div class="border-2 border-dashed border-[#D4A017]/50 rounded-xl p-5 text-center bg-[#FFFDF8]">
+                    <p class="text-[#8B6914]/50 text-xs mb-2">Leave blank to keep existing file</p>
+                    {{ product_form.file }}
+                </div>
+            </div>
+
+            <hr class="border-[#D4A017]/30">
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-1">
+                <button type="submit"
+                        class="flex-1 bg-[#D4A017] text-white rounded-full px-6 py-3 font-semibold hover:bg-[#6B4F10] transition-colors">
+                    Save Changes
+                </button>
+                <a href="{% url 'delete' product.id %}"
+                   class="flex-1 text-center bg-red-100 text-red-700 border border-red-300 rounded-full px-6 py-3 font-semibold hover:bg-red-200 transition-colors">
+                    Delete Product
+                </a>
+            </div>
+        </form>
+
+    </div>
 </div>
+
 {% endblock %}

@@ -1,11 +1,32 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<div class="flex flex-col justify-center items-center min-h-screen">
-    <h1 class="mb-5">Are you sure you want to delete the product?</h1>
-    <form method="POST" action="{% url 'delete' product.id %}">
-        {% csrf_token %}
-        <button class="bg-red-500 text-white px-4 py-2">Confirm</button>
-        <a class="bg-green-500 text-white px-6 py-3" href="{% url 'index' %}">No</a>
-    </form>
+
+<div class="min-h-[75vh] flex items-center justify-center px-4 py-16">
+    <div class="bg-white rounded-2xl shadow-md p-10 border border-[#D4A017]/20 w-full max-w-sm text-center">
+
+        <div class="text-5xl mb-5">⚠️</div>
+
+        <h2 class="text-2xl font-bold font-playfair text-[#8B6914] mb-3">Delete Product?</h2>
+
+        <p class="text-sm text-[#5A3E1A]/70 leading-relaxed mb-2">
+            Are you sure you want to delete
+            <span class="font-semibold text-[#8B6914]">{{ product.name }}</span>?
+        </p>
+        <p class="text-xs text-red-500 mb-8">This action cannot be undone.</p>
+
+        <form method="POST" action="{% url 'delete' product.id %}" class="flex flex-col gap-3">
+            {% csrf_token %}
+            <button type="submit"
+                    class="w-full bg-red-100 text-red-700 border border-red-300 rounded-full px-6 py-2.5 font-semibold hover:bg-red-200 transition-colors">
+                Yes, Delete
+            </button>
+            <a href="{% url 'index' %}"
+               class="w-full text-center bg-[#D4A017] text-white rounded-full px-6 py-2.5 font-semibold hover:bg-[#6B4F10] transition-colors">
+                Cancel
+            </a>
+        </form>
+
+    </div>
 </div>
+
 {% endblock %}

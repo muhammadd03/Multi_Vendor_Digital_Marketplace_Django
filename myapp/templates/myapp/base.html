@@ -3,28 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <!-- Google Fonts: Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'playfair': ['"Playfair Display"', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <title>Document</title>
+    <title>Yarnivore</title>
 </head>
-<body>
-    <nav class="shadow-lg ">
-        <div class="flex flex-wrap justify-between ml-5 items-center mx-auto px-4 py-2.5">
-            <a href="" class="flex item-center">
-                <img class="h-9 mr-3" src="https://cdn1.iconfinder.com/data/icons/time-schedule-call-weather-contact-3d-blue-illustr/512/10.png" alt="">
-                <span class="self-center text-xl font-semibold">Digital Marketplace</span>
+<body class="bg-[#F5F0E8] min-h-screen flex flex-col font-sans text-[#3A2A10]">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm border-b border-[#D4A017]/20">
+        <div class="max-w-7xl flex flex-wrap justify-between items-center mx-auto px-6 py-3">
+
+            <!-- Brand -->
+            <a href="{% url 'index' %}" class="flex items-center space-x-2">
+                <img class="h-8 w-auto" src="{% static 'myapp/logo-bg-removed.png' %}" alt="Yarnivore">
+                <div class="flex flex-col leading-tight">
+                    <span class="text-xl font-semibold text-[#8B6914] leading-none font-playfair">Yarnivore</span>
+                    <span class="text-xs italic text-[#8B6914]/70 tracking-wide leading-snug">Turning yarn into emotions</span>
+                </div>
             </a>
-            <div class="flex items-center">
-                <a href="{% url 'dashboard' %}" class="mr-6 text-sm font-medium text-gray-500">Dashboard</a>
-                <a href="{% url 'sales' %}" class="mr-6 text-sm font-medium text-gray-500">Sales</a>
-                <a href="" class="mr-6 text-sm font-medium text-gray-500">Orders</a>
-                <a href="{% url 'createproduct' %}" class="mr-6 text-sm font-medium text-gray-500">Create Products</a>
-                <a href="{% url 'purchases' %}" class="mr-6 text-sm font-medium text-gray-500">My Purchases</a>
-                <a href="{% url 'logout' %}" class="mr-6 text-sm font-medium text-gray-500">Logout</a>
+
+            <!-- Nav links -->
+            <div class="flex items-center gap-1">
+                {% if not request.user.is_authenticated %}
+                    <a href="{% url 'products' %}" class="text-sm font-medium text-[#8B6914] hover:text-[#D4A017] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#F5F0E8]">Products</a>
+                    <!-- Navbar search (unauthenticated) -->
+                    <form method="GET" action="{% url 'products' %}" class="hidden md:flex items-center mx-2">
+                        <div class="flex rounded-full overflow-hidden border border-[#D4A017]/40">
+                            <input type="text" name="q" placeholder="Search..."
+                                   class="px-3 py-1 text-sm bg-[#FFFDF8] text-[#8B6914] placeholder-[#8B6914]/50 focus:outline-none w-32 md:w-44">
+                            <button type="submit"
+                                    class="bg-[#D4A017] text-white px-3 py-1 text-sm hover:bg-[#6B4F10] transition">✦</button>
+                        </div>
+                    </form>
+                    <a href="{% url 'auth' %}" class="bg-[#D4A017] text-white rounded-full px-5 py-1.5 text-sm font-semibold hover:bg-[#6B4F10] transition-colors ml-2">Login / Register</a>
+                {% elif not request.user.profile.is_vendor %}
+                    <a href="{% url 'products' %}" class="text-sm font-medium text-[#8B6914] hover:text-[#D4A017] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#F5F0E8]">Products</a>
+                    <!-- Navbar search (customer) -->
+                    <form method="GET" action="{% url 'products' %}" class="hidden md:flex items-center mx-2">
+                        <div class="flex rounded-full overflow-hidden border border-[#D4A017]/40">
+                            <input type="text" name="q" placeholder="Search..."
+                                   class="px-3 py-1 text-sm bg-[#FFFDF8] text-[#8B6914] placeholder-[#8B6914]/50 focus:outline-none w-32 md:w-44">
+                            <button type="submit"
+                                    class="bg-[#D4A017] text-white px-3 py-1 text-sm hover:bg-[#6B4F10] transition">✦</button>
+                        </div>
+                    </form>
+                    <a href="{% url 'purchases' %}" class="text-sm font-medium text-[#8B6914] hover:text-[#D4A017] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#F5F0E8]">My Purchases</a>
+                    <a href="{% url 'logout' %}" class="text-sm font-medium text-[#8B6914]/50 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 ml-1">Logout</a>
+                {% else %}
+                    <a href="{% url 'dashboard' %}" class="text-sm font-medium text-[#8B6914] hover:text-[#D4A017] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#F5F0E8]">Dashboard</a>
+                    <a href="{% url 'createproduct' %}" class="text-sm font-medium text-[#8B6914] hover:text-[#D4A017] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#F5F0E8]">Create Product</a>
+                    <a href="{% url 'sales' %}" class="text-sm font-medium text-[#8B6914] hover:text-[#D4A017] transition-colors px-3 py-1.5 rounded-lg hover:bg-[#F5F0E8]">Sales</a>
+                    <a href="{% url 'logout' %}" class="text-sm font-medium text-[#8B6914]/50 hover:text-red-500 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-50 ml-1">Logout</a>
+                {% endif %}
             </div>
+
         </div>
     </nav>
-    {% block body %}
-    {% endblock %}
+
+    <!-- Page content -->
+    <main class="flex-1">
+        {% block body %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#5A3E1A] text-[#F5F0E8]">
+        <div class="max-w-6xl mx-auto px-4 py-8 text-center">
+            <p class="text-base font-semibold tracking-wide mb-1 font-playfair">
+                Yarnivore <span class="text-[#D4A017]">·</span> Turning yarn into emotions
+            </p>
+            <p class="text-xs text-[#F5F0E8]/60 mb-4">
+                <a href="#" class="hover:text-[#D4A017] transition-colors">Instagram</a>
+                <span class="mx-2 text-[#D4A017]/50">·</span>
+                <a href="#" class="hover:text-[#D4A017] transition-colors">Contact</a>
+                <span class="mx-2 text-[#D4A017]/50">·</span>
+                <a href="#" class="hover:text-[#D4A017] transition-colors">FAQ</a>
+            </p>
+            <div class="h-px bg-[#F5F0E8]/10 mb-4 max-w-xs mx-auto"></div>
+            <p class="text-xs text-[#F5F0E8]/40">&copy; 2026 Yarnivore. All rights reserved.</p>
+        </div>
+    </footer>
+
 </body>
 </html>

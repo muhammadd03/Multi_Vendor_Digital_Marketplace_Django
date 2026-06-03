@@ -1,43 +1,108 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<div class="flex justify-between">
-    <div class="ml-20 mt-10 font-bold text-xl">My Products</div>
-    <div class="ml-20 mt-10">
-        <a class="bg-green-500 text-white px-2 py-4 mr-8 rounded" href="{% url 'createproduct' %}">New Product</a>
+
+<!-- Page header -->
+<div class="bg-[#F5F0E8] border-b border-[#D4A017]/20 py-14 text-center">
+    <h1 class="text-4xl font-bold font-playfair text-[#8B6914] mb-1">Vendor Dashboard <span class="text-[#D4A017]">✦</span></h1>
+    <p class="text-sm text-[#5A3E1A]/60">Welcome back, <span class="font-semibold text-[#8B6914]">{{ request.user.username }}</span></p>
+</div>
+
+<div class="max-w-6xl mx-auto px-6 py-10">
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20 text-center">
+            <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-3">Listed Products</p>
+            <p class="text-5xl font-bold font-playfair text-[#8B6914]">{{ products|length }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20 text-center flex flex-col items-center justify-center">
+            <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-3">Revenue &amp; Orders</p>
+            <a href="{% url 'sales' %}"
+               class="text-sm font-semibold text-[#D4A017] hover:text-[#6B4F10] transition-colors">
+                View Sales Analytics →
+            </a>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-6 border border-[#D4A017]/20 text-center flex flex-col items-center justify-center">
+            <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-3">Quick Action</p>
+            <a href="{% url 'createproduct' %}"
+               class="bg-[#D4A017] text-white rounded-full px-6 py-2 font-semibold hover:bg-[#6B4F10] transition-colors text-sm">
+                ➕ New Product
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Product table card -->
+    <div class="bg-white rounded-2xl shadow-md border border-[#D4A017]/20 overflow-hidden">
+
+        <!-- Table header -->
+        <div class="flex items-center justify-between px-6 py-5 border-b border-[#D4A017]/15">
+            <h2 class="text-xl font-bold font-playfair text-[#8B6914]">Your Products</h2>
+            <a href="{% url 'createproduct' %}"
+               class="bg-[#D4A017] text-white rounded-full px-5 py-2 text-sm font-semibold hover:bg-[#6B4F10] transition-colors">
+                Create New Product
+            </a>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-[#F5F0E8] text-[#8B6914]">
+                        <th class="text-left px-6 py-3 font-semibold">Product Name</th>
+                        <th class="text-left px-6 py-3 font-semibold">Orders</th>
+                        <th class="text-left px-6 py-3 font-semibold">Revenue</th>
+                        <th class="text-right px-6 py-3 font-semibold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr class="border-t border-[#D4A017]/10 hover:bg-[#F5F0E8]/40 transition-colors {% if forloop.even %}bg-[#FFFDF8]{% else %}bg-white{% endif %}">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 rounded-xl overflow-hidden bg-[#F5F0E8] flex-shrink-0 flex items-center justify-center">
+                                    {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="h-full w-full object-cover">
+                                    {% elif product.file %}
+                                    <img src="{{ product.file.url }}" alt="{{ product.name }}" class="h-full w-full object-cover">
+                                    {% else %}
+                                    <span class="text-xl">🧶</span>
+                                    {% endif %}
+                                </div>
+                                <span class="font-semibold text-[#3A2A10]">{{ product.name }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-[#5A3E1A]">{{ product.total_sales }}</td>
+                        <td class="px-6 py-4 font-bold text-[#D4A017]">PKR {{ product.total_sales_amount }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{% url 'editproduct' product.id %}"
+                               class="bg-[#D4A017] text-white rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-[#6B4F10] transition-colors mr-2">
+                                Edit
+                            </a>
+                            <a href="{% url 'delete' product.id %}"
+                               class="bg-red-100 text-red-700 border border-red-300 rounded-full px-4 py-1.5 text-xs font-semibold hover:bg-red-200 transition-colors">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-16 text-center text-[#8B6914]/40">
+                            <p class="text-4xl mb-3">🧶</p>
+                            <p class="text-base">No products yet.
+                                <a href="{% url 'createproduct' %}" class="text-[#D4A017] hover:underline">Create your first →</a>
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </div>
-<div class="products-container p-10 m-5">
-    {% for product in products %}
-    <div class="flex m-5 p-2 justify-between shadow-lg">
-        <div class="flex w-1/4">
-            <img class="h-[50px]" src="{{ product.file.url }}" alt="">
-        <div class="relative group">
-            <a href="{% url 'editproduct' product.id %}">
-            <div class="opacity-0 group-hover:opacity-100 duration-300 absolute inset-x-0 bottom-0 p-6 justify-center items-end bg-white font-semibold">
-                Edit Product
-            </div>
-            <div class="ml-5">
-                <div class="font-bold text-sm">{{ product.name }}</div>
-                <div class="text-sm text-green-500">${{ product.price }}</div>
-            </div>
-        </a>
-        </div>
-        </div>
-        <div>
-            <div class="text-2xl text-green-500">${{ product.total_sales_amount }}</div>
-            <div class="text-xs">Total earnings</div>
-        </div>
-        <div>
-            <div class="text-2xl ">{{ product.total_sales }}</div>
-            <div class="text-xs">Total orders</div>
-        </div>
-        <div class="pr-5">
-            <div class="text-2xl ">4.8</div>
-            <div class="text-xs">Rating</div>
-        </div>
-    </div>
-        
-        
-    {% endfor %}
-</div>
+
 {% endblock %}

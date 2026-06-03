@@ -1,5 +1,24 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<p>Thank you for your order!. You can download your product from My Purchases</p>
-<a href="{% url 'index' %}" class="bg-green-500 fontbold text-white ox-4 py-2">Go backk to home page</a>
+
+<div class="min-h-[80vh] flex flex-col items-center justify-center text-center px-6 py-16">
+
+    <div class="text-7xl mb-4">🧶</div>
+    <span class="text-[#D4A017] text-4xl select-none mb-6">✦</span>
+
+    <h1 class="text-4xl font-bold font-playfair text-[#8B6914] mb-4">
+        Order Placed Successfully!
+    </h1>
+
+    <p class="text-base text-[#5A3E1A]/70 max-w-md mb-10 leading-relaxed">
+        Thank you for your purchase. You'll receive your product soon after payment verification.
+    </p>
+
+    <a href="{% url 'purchases' %}"
+       class="bg-[#D4A017] text-white rounded-full px-10 py-3.5 font-semibold hover:bg-[#6B4F10] transition-colors text-base">
+        View My Purchases
+    </a>
+
+</div>
+
 {% endblock %}

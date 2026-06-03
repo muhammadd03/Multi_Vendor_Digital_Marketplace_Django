@@ -1,31 +1,98 @@
 from django.shortcuts import render,redirect
 # request, reverse
 from django.shortcuts import get_object_or_404
-from .models import Product,OrderDetail
+from .models import Product, OrderDetail, UserProfile, Review
 # from django.http import JsonResponse
 # from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 # from django.core.mail import send_mail
-from .forms import ProductForm, UserRegistrationForm
-from django.contrib.auth import logout
+from .forms import ProductForm, UserRegistrationForm, CheckoutForm
+from django.contrib.auth import logout, login as auth_login
+from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Sum
 import datetime
 
 # Create your views here.
 def index(request):
-    products = Product.objects.all()
-    return render(request, 'myapp/index.html',{'products':products})
+    is_vendor = False
+    if request.user.is_authenticated:
+        try:
+            is_vendor = request.user.profile.is_vendor
+        except Exception:
+            is_vendor = False
+    return render(request, 'myapp/index.html', {'is_vendor': is_vendor})
 
-def detail(request,id):
-    product = Product.objects.get(id=id)
-    return render(request,'myapp/detail.html',{'product':product})
+def products_page(request):
+    from django.db.models import Q
+    query = request.GET.get('q', '').strip()
+    products = Product.objects.all()
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+    return render(request, 'myapp/products.html', {'products': products, 'query': query})
+
+def detail(request, id):
+    product = get_object_or_404(Product, id=id)
+    reviews = product.reviews.all().order_by('-created_on')
+    has_purchased = False
+    user_review = None
+    if request.user.is_authenticated:
+        has_purchased = OrderDetail.objects.filter(
+            customer_email=request.user.email,
+            product=product,
+            has_paid=True
+        ).exists()
+        user_review = Review.objects.filter(product=product, customer=request.user).first()
+    if request.method == 'POST' and has_purchased and not user_review:
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        if rating and comment:
+            Review.objects.create(
+                product=product,
+                customer=request.user,
+                rating=int(rating),
+                comment=comment
+            )
+            return redirect('detail', id=id)
+    return render(request, 'myapp/detail.html', {
+        'product': product,
+        'reviews': reviews,
+        'has_purchased': has_purchased,
+        'user_review': user_review,
+    })
 
 @login_required
 def checkout(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if request.method == 'POST':
-        return redirect('bank_transfer', product_id=product.id)
-    return render(request, 'myapp/checkout.html', {'product': product})
+        checkout_form = CheckoutForm(request.POST)
+        if checkout_form.is_valid():
+            billing = {
+                'full_name': checkout_form.cleaned_data['full_name'],
+                'phone_number': checkout_form.cleaned_data['phone_number'],
+                'address': checkout_form.cleaned_data['address'],
+                'city': checkout_form.cleaned_data['city'],
+                'payment_method': checkout_form.cleaned_data['payment_method'],
+            }
+            request.session['billing'] = billing
+            if billing['payment_method'] == 'cod':
+                OrderDetail.objects.create(
+                    customer_email=request.user.email,
+                    product=product,
+                    amount=int(product.price),
+                    has_paid=False,
+                    payment_method='cod',
+                    full_name=billing['full_name'],
+                    phone_number=billing['phone_number'],
+                    address=billing['address'],
+                    city=billing['city'],
+                )
+                return redirect('order_success')
+            return redirect('bank_transfer', product_id=product.id)
+    else:
+        checkout_form = CheckoutForm()
+    return render(request, 'myapp/checkout.html', {'product': product, 'checkout_form': checkout_form})
 
 @login_required
 def bank_transfer(request, product_id):
@@ -33,15 +100,21 @@ def bank_transfer(request, product_id):
     if request.method == 'POST':
         amount = request.POST['amount']
         customer_email = request.user.email
-        reciept = request.FILES.get('reciept') 
+        reciept = request.FILES.get('reciept')
+        billing = request.session.get('billing', {})
         order = OrderDetail.objects.create(
             customer_email=customer_email,
             product=product,
-            amount=amount,
+            amount=int(float(amount)),
             has_paid=False,
-            reciept=reciept
+            reciept=reciept,
+            full_name=billing.get('full_name', ''),
+            phone_number=billing.get('phone_number', ''),
+            address=billing.get('address', ''),
+            city=billing.get('city', ''),
+            payment_method='bank_transfer',
         )
-        return redirect('payment_confirmation',order_id = order.id)
+        return redirect('payment_confirmation', order_id=order.id)
     return render(request, 'myapp/bank_transfer.html', {'product': product})
 
 @login_required
@@ -102,19 +175,41 @@ def dashboard(request):
     products = Product.objects.filter(seller = request.user)
     return render(request,'myapp/dashboard.html',{'products':products})
 
-def register(request):
+def auth_page(request):
+    login_form = AuthenticationForm()
+    register_form = UserRegistrationForm()
+    active_tab = request.GET.get('tab', 'login')
+
     if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
-        new_user = user_form.save(commit=False)
-        new_user.set_password(user_form.cleaned_data['password'])
-        new_user.save()
-        return redirect('index')
-    user_form = UserRegistrationForm()
-    return render(request, 'myapp/register.html',{'user_form':user_form})
+        if 'login_submit' in request.POST:
+            login_form = AuthenticationForm(data=request.POST)
+            if login_form.is_valid():
+                auth_login(request, login_form.get_user())
+                return redirect('index')
+            active_tab = 'login'
+        elif 'register_submit' in request.POST:
+            register_form = UserRegistrationForm(request.POST)
+            if register_form.is_valid():
+                new_user = register_form.save(commit=False)
+                new_user.set_password(register_form.cleaned_data['password'])
+                new_user.save()
+                role = register_form.cleaned_data.get('role')
+                profile, _ = UserProfile.objects.get_or_create(user=new_user)
+                profile.is_vendor = (role == 'vendor')
+                profile.save()
+                auth_login(request, new_user, backend='django.contrib.auth.backends.ModelBackend')
+                return redirect('index')
+            active_tab = 'register'
+
+    return render(request, 'myapp/auth.html', {
+        'login_form': login_form,
+        'register_form': register_form,
+        'active_tab': active_tab,
+    })
 
 def logout_view(request):
     logout(request)
-    return render(request,'myapp/logout.html')
+    return redirect('index')
 
 def sales(request):
     orders = OrderDetail.objects.filter(product__seller=request.user)

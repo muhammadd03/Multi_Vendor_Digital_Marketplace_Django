@@ -1,8 +1,51 @@
 {% extends 'myapp/base.html' %}
 {% block body %}
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    your payment has been confirmed
-    <button type="submit">Next</button>
-</form>
+
+<!-- Page header -->
+<div class="bg-[#F5F0E8] border-b border-[#D4A017]/20 py-10 text-center">
+    <p class="text-xs uppercase tracking-widest text-[#8B6914]/60 mb-2 font-semibold">Step 3 of 3</p>
+    <h1 class="text-3xl font-bold font-playfair text-[#8B6914]">Confirm Payment <span class="text-[#D4A017]">✦</span></h1>
+</div>
+
+<div class="min-h-[60vh] flex items-center justify-center px-4 py-12">
+    <div class="bg-white rounded-2xl shadow-md p-8 border border-[#D4A017]/20 w-full max-w-lg">
+
+        <!-- Order summary -->
+        <div class="bg-[#F5F0E8] rounded-xl p-5 mb-6">
+            <h3 class="font-bold font-playfair text-[#8B6914] text-lg mb-4">Order Summary</h3>
+            <div class="space-y-2 text-sm text-[#5A3E1A]">
+                <div class="flex justify-between">
+                    <span class="text-[#8B6914]/60">Product</span>
+                    <span class="font-semibold">{{ order.product.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#8B6914]/60">Amount Paid</span>
+                    <span class="font-bold text-[#D4A017] text-base">PKR {{ order.amount }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-[#8B6914]/60">Email</span>
+                    <span>{{ order.customer_email }}</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-sm text-[#5A3E1A]/70 text-center mb-6 leading-relaxed">
+            Please confirm that you have completed the bank transfer. Your order will be processed after verification.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3">
+            {% csrf_token %}
+            <button type="submit"
+                    class="flex-1 bg-[#D4A017] text-white rounded-full px-6 py-2.5 font-semibold hover:bg-[#6B4F10] transition-colors">
+                Confirm Payment
+            </button>
+            <a href="{% url 'index' %}"
+               class="flex-1 text-center bg-red-100 text-red-700 border border-red-300 rounded-full px-6 py-2.5 font-semibold hover:bg-red-200 transition-colors">
+                Cancel
+            </a>
+        </form>
+
+    </div>
+</div>
+
 {% endblock %}
