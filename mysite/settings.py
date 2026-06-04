@@ -13,15 +13,15 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS if host != '*']
 
 INSTALLED_APPS = [
-    'myapp',
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
-    'cloudinary',
     'django.contrib.staticfiles',
+    'cloudinary',
+    'myapp',
 ]
 
 MIDDLEWARE = [
