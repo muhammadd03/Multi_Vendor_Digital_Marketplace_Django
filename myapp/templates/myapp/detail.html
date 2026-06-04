@@ -15,7 +15,7 @@
         <div class="bg-white rounded-2xl shadow-md border border-[#D4A017]/20 overflow-hidden">
             <div class="aspect-square">
                 {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}"
+                <img src="{{ product.image_url }}" alt="{{ product.name }}"
                      class="w-full h-full object-cover">
                 {% elif product.file %}
                 <img src="{{ product.file.url }}" alt="{{ product.name }}"

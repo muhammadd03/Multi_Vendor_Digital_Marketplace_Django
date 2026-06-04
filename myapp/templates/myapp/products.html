@@ -39,7 +39,7 @@
             <!-- Image -->
             <div class="aspect-square bg-[#F5F0E8] overflow-hidden">
                 {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
                 {% elif product.file %}
                 <img src="{{ product.file.url }}" alt="{{ product.name }}" class="w-full h-full object-cover"
                      onerror="this.parentElement.innerHTML='<div class=\'flex items-center justify-center h-full text-6xl\'>🧶</div>'">

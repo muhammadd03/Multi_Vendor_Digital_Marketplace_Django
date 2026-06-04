@@ -14,6 +14,12 @@ class Product(models.Model):
     total_sales_amount = models.IntegerField(default=0)
     total_sales = models.IntegerField(default=0)
 
+    @property
+    def image_url(self):
+        if self.image:
+            return f"https://raw.githubusercontent.com/muhammadd03/Multi_Vendor_Digital_Marketplace_Django/main/media/{self.image}"
+        return ""
+
     def __str__(self):
         return self.name
 
